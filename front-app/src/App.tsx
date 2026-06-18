@@ -26,7 +26,7 @@ function App() {
         <Route path="/login" element={<Login session={session} refresh={refresh} apiFetch={apiFetch} />} />
         <Route path="/profile" element={
           <ProtectedRoute session={session}>
-            <Profile session={session!} />
+            <Profile session={session!} apiFetch={apiFetch} />
           </ProtectedRoute>
         } />
         <Route path="/settings" element={
