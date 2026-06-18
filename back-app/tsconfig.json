@@ -21,13 +21,18 @@
     "strictBindCallApply": true,
     "strictPropertyInitialization": false,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@bootstrap/*": ["bootstrap/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@bootstrap/*": [
+        "./bootstrap/*"
+      ]
     }
   },
   "ts-node": {
-    "require": ["tsconfig-paths/register"]
+    "require": [
+      "tsconfig-paths/register"
+    ]
   }
 }

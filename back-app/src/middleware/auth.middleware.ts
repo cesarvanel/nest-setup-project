@@ -14,7 +14,7 @@ export class AuthMiddleware implements NestMiddleware {
     const isPublic = PUBLIC_ROUTES.some(
       ({ path, method }) => path.test(req.path) && method === req.method,
     );
-
+    
     if (isPublic) return next();
 
     if (!req.session?.userId) {
