@@ -3,7 +3,10 @@ import { SessionOptions } from 'express-session';
 import './session.types';
 
 export class SessionConfig {
-  constructor(private readonly config: ConfigService) {}
+  constructor(
+    private readonly config: ConfigService,
+    private readonly isProdMode: boolean,
+  ) {}
 
   build(): SessionOptions {
     return {
@@ -13,9 +16,9 @@ export class SessionConfig {
       saveUninitialized: false,
       cookie: {
         httpOnly: true,
-        secure: this.config.get('NODE_ENV') === 'production',
+        secure: this.isProdMode,
         sameSite: 'lax',
-        maxAge: 1000 * 60 * 60 * 24,
+        maxAge: 1000 * 60 * 5,
       },
     };
   }

@@ -27,7 +27,7 @@ class Application {
     session.configure();
     this.app.get(CsrfService).init(session.generateCsrfToken);
 
-    new SwaggerBootstrap(this.app, this.config).configure();
+    new SwaggerBootstrap(this.app).configure();
 
     this.app.setGlobalPrefix('api');
 

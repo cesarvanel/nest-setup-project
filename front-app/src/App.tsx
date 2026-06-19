@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import Navbar from '@/components/Navbar'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import Home from '@/pages/Home'
@@ -10,16 +10,20 @@ import './App.css'
 
 function App() {
   const { session, loading, refresh, apiFetch } = useSession()
+  const navigate = useNavigate()
 
   const handleLogout = async () => {
-    await apiFetch('/api/auth/logout', { method: 'POST' })
-    refresh()
+    const res = await apiFetch('/api/auth/logout', { method: 'POST' })
+    if (res.ok) {
+      await refresh()
+      navigate('/')
+    }
   }
 
   if (loading) return null
 
   return (
-    <BrowserRouter>
+    <>
       <Navbar session={session} onLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<Home session={session} />} />
@@ -35,7 +39,7 @@ function App() {
           </ProtectedRoute>
         } />
       </Routes>
-    </BrowserRouter>
+    </>
   )
 }
 

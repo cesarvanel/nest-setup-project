@@ -1,15 +1,14 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { ConfigService } from '@nestjs/config';
+import { ConfigType } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { appConfig } from '@/config/app.config';
 
 export class SwaggerBootstrap {
-  constructor(
-    private readonly app: NestExpressApplication,
-    private readonly config: ConfigService,
-  ) {}
+  constructor(private readonly app: NestExpressApplication) {}
 
   configure(): void {
-    if (this.config.get('NODE_ENV') === 'production') return;
+    const { isProdMode } = this.app.get<ConfigType<typeof appConfig>>(appConfig.KEY);
+    if (isProdMode) return;
 
     const config = new DocumentBuilder()
       .setTitle('Nest Setup Example')

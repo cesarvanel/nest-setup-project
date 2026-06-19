@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 
 export interface Session {
   userId: string | null
-  isNew: boolean
   csrfToken: string
 }
 
@@ -12,8 +11,11 @@ export function useSession() {
 
   const refresh = () =>
     fetch('/api/session')
-      .then((res) => res.json())
-      .then((data: Session) => setSession(data))
+      .then((res) => {
+        const csrfToken = res.headers.get('X-CSRF-Token') ?? ''
+        const userId = res.headers.get('X-User-Id') ?? null
+        setSession({ userId, csrfToken })
+      })
       .finally(() => setLoading(false))
 
   useEffect(() => { refresh() }, [])
@@ -26,6 +28,11 @@ export function useSession() {
         'x-csrf-token': session?.csrfToken ?? '',
         ...options.headers,
       },
+    }).then(async (res) => {
+      if (res.status === 401) {
+        await refresh()
+      }
+      return res
     })
 
   return { session, loading, refresh, apiFetch }
