@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import type { Session } from '@/hooks/useSession'
+import { useSession } from '@/context/SessionContext'
 import './Profile.css'
 
 interface ProfileData {
@@ -9,12 +9,8 @@ interface ProfileData {
   avatar: number
 }
 
-interface Props {
-  session: Session
-  apiFetch: (url: string, options?: RequestInit) => Promise<Response>
-}
-
-function Profile({ session, apiFetch }: Props) {
+function Profile() {
+  const { session, apiFetch } = useSession()
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({ displayName: '', bio: '' })
@@ -64,7 +60,7 @@ function Profile({ session, apiFetch }: Props) {
             ) : (
               <h1>{profile.displayName}</h1>
             )}
-            <p className="username">@{session.userId}</p>
+            <p className="username">@{session?.userId}</p>
           </div>
         </div>
 

@@ -1,43 +1,26 @@
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import Navbar from '@/components/Navbar'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import Home from '@/pages/Home'
 import Login from '@/pages/Login'
 import Profile from '@/pages/Profile'
 import Settings from '@/pages/Settings'
-import { useSession } from '@/hooks/useSession'
+import { useSession } from '@/context/SessionContext'
 import './App.css'
 
 function App() {
-  const { session, loading, refresh, apiFetch } = useSession()
-  const navigate = useNavigate()
-
-  const handleLogout = async () => {
-    const res = await apiFetch('/api/auth/logout', { method: 'POST' })
-    if (res.ok) {
-      await refresh()
-      navigate('/')
-    }
-  }
+  const { loading } = useSession()
 
   if (loading) return null
 
   return (
     <>
-      <Navbar session={session} onLogout={handleLogout} />
+      <Navbar />
       <Routes>
-        <Route path="/" element={<Home session={session} />} />
-        <Route path="/login" element={<Login session={session} refresh={refresh} apiFetch={apiFetch} />} />
-        <Route path="/profile" element={
-          <ProtectedRoute session={session}>
-            <Profile session={session!} apiFetch={apiFetch} />
-          </ProtectedRoute>
-        } />
-        <Route path="/settings" element={
-          <ProtectedRoute session={session}>
-            <Settings session={session!} />
-          </ProtectedRoute>
-        } />
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       </Routes>
     </>
   )

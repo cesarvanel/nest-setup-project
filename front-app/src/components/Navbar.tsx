@@ -1,13 +1,9 @@
 import { Link, useLocation } from 'react-router-dom'
-import type { Session } from '@/hooks/useSession'
+import { useSession } from '@/context/SessionContext'
 import './Navbar.css'
 
-interface Props {
-  session: Session | null
-  onLogout: () => void
-}
-
-function Navbar({ session, onLogout }: Props) {
+function Navbar() {
+  const { session, logout } = useSession()
   const location = useLocation()
   const isActive = (path: string) => location.pathname === path ? 'active' : ''
 
@@ -23,7 +19,7 @@ function Navbar({ session, onLogout }: Props) {
             <>
               <li><Link to="/profile" className={isActive('/profile')}>Profil</Link></li>
               <li><Link to="/settings" className={isActive('/settings')}>Paramètres</Link></li>
-              <li><button className="nav-logout" onClick={onLogout}>Déconnexion</button></li>
+              <li><button className="nav-logout" onClick={logout}>Déconnexion</button></li>
             </>
           ) : (
             <li><Link to="/login" className={isActive('/login')}>Connexion</Link></li>

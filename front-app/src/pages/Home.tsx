@@ -1,12 +1,10 @@
 import { Link } from 'react-router-dom'
-import type { Session } from '../hooks/useSession'
+import { useSession } from '@/context/SessionContext'
 import '../App.css'
 
-interface Props {
-  session: Session | null
-}
+function Home() {
+  const { session } = useSession()
 
-function Home({ session }: Props) {
   return (
     <section id="center">
       <div>

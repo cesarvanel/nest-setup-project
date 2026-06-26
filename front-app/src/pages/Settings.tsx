@@ -1,11 +1,9 @@
-import type { Session } from '../hooks/useSession'
+import { useSession } from '@/context/SessionContext'
 import './Settings.css'
 
-interface Props {
-  session: Session
-}
+function Settings() {
+  const { session } = useSession()
 
-function Settings({ session }: Props) {
   return (
     <div className="settings-page">
       <h1>Paramètres</h1>
@@ -14,7 +12,7 @@ function Settings({ session }: Props) {
         <h2>Compte</h2>
         <div className="settings-row">
           <span className="settings-label">Nom d'utilisateur</span>
-          <span className="settings-badge">{session.userId}</span>
+          <span className="settings-badge">{session?.userId}</span>
         </div>
         <div className="settings-row">
           <span className="settings-label">Statut</span>

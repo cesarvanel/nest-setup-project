@@ -1,15 +1,10 @@
 import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import type { Session } from '@/hooks/useSession'
+import { useSession } from '@/context/SessionContext'
 import './Login.css'
 
-interface Props {
-  session: Session | null
-  refresh: () => void
-  apiFetch: (url: string, options?: RequestInit) => Promise<Response>
-}
-
-function Login({ session, refresh, apiFetch }: Props) {
+function Login() {
+  const { session, refresh, apiFetch } = useSession()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)

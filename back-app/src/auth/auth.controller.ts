@@ -12,11 +12,11 @@ export class AuthController {
   ) {}
 
   @Post('login')
-  @HttpCode(204)
+  @HttpCode(200)
   async login(
     @Body() dto: LoginDto,
     @Req() req: Request,
-  ): Promise<void> {
+  ): Promise<{ userId: string }> {
     const userId = this.authService.validate(dto.username, dto.password);
 
     await new Promise<void>((resolve, reject) => {
@@ -25,6 +25,8 @@ export class AuthController {
 
     req.session.userId = userId;
     req.session.createdAt = new Date().toISOString();
+
+    return { userId };
   }
 
   @Post('logout')
