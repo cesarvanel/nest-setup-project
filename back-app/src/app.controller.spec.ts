@@ -15,4 +15,9 @@ describe('AppController', () => {
   it('should return health status', () => {
     expect(appController.health()).toEqual({ status: 'ok' });
   });
+
+  it('should return the signed-in user id, or null', () => {
+    expect(appController.session({ id: 'admin' })).toEqual({ userId: 'admin' });
+    expect(appController.session(null)).toEqual({ userId: null });
+  });
 });

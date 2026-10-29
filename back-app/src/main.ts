@@ -1,37 +1,44 @@
 import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { ConfigService } from '@nestjs/config';
+import { NodeAdapter } from '@nestjs/platform-node';
+import type { NestNodeApplication } from '@nestjs/platform-node';
 import { ConfigType } from '@nestjs/config';
+import compression from 'compression';
 import { AppModule } from '@/app.module';
-import { CsrfService } from '@/csrf/csrf.service';
 import { appConfig } from '@/config/app.config';
-import { MiddlewareBootstrap } from '@bootstrap/middleware.bootstrap';
-import { SessionBootstrap } from '@bootstrap/session.bootstrap';
+import { authConfig } from '@/config/auth.config';
 import { SwaggerBootstrap } from '@bootstrap/swagger.bootstrap';
 
 class Application {
-  private app: NestExpressApplication;
-  private config: ConfigService;
+  private app: NestNodeApplication;
 
   static async create(): Promise<Application> {
     const instance = new Application();
-    instance.app = await NestFactory.create<NestExpressApplication>(AppModule.forRoot());
-    instance.config = instance.app.get(ConfigService);
+    instance.app = await NestFactory.create<NestNodeApplication>(
+      AppModule.forRoot(),
+      new NodeAdapter(),
+    );
     return instance;
   }
 
   configure(): this {
-    new MiddlewareBootstrap(this.app, this.config).configure();
-
-    const session = new SessionBootstrap(this.app, this.config);
-    session.configure();
-    this.app.get(CsrfService).init(session.generateCsrfToken);
-
+    this.configureSecurity();
+    this.configureMiddleware();
     new SwaggerBootstrap(this.app).configure();
 
     this.app.setGlobalPrefix('api');
 
     return this;
+  }
+
+  private configureSecurity(): void {
+    const { trustedOrigins } = this.app.get<ConfigType<typeof authConfig>>(
+      authConfig.KEY,
+    );
+    this.app.enableCsrfProtection({ trustedOrigins });
+  }
+
+  private configureMiddleware(): void {
+    this.app.use(compression());
   }
 
   async listen(): Promise<void> {
@@ -40,5 +47,4 @@ class Application {
   }
 }
 
-Application.create()
-  .then((app) => app.configure().listen());
+Application.create().then((app) => app.configure().listen());

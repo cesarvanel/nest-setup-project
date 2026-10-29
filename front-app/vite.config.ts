@@ -17,7 +17,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://localhost:4500',
-        changeOrigin: true,
+        changeOrigin: false, // keep Host = the Vite origin, so the CSRF Origin/Host check passes
       },
     },
   },

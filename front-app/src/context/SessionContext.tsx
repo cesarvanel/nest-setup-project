@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 
 export interface Session {
   userId: string | null
-  csrfToken: string
 }
 
 interface SessionContextValue {
@@ -23,11 +22,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const refresh = (): Promise<void> =>
     fetch('/api/session')
-      .then(async (res) => {
-        const csrfToken = res.headers.get(import.meta.env.VITE_COOKIE_NAME) ?? ''
-        const data: { userId: string | null } = await res.json()
-        setSession({ userId: data.userId, csrfToken })
-      })
+      .then((res) => res.json())
+      .then((data: Session) => setSession({ userId: data.userId }))
       .finally(() => setLoading(false))
 
   useEffect(() => { refresh() }, [])
@@ -37,7 +33,6 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       ...options,
       headers: {
         'Content-Type': 'application/json',
-        'x-csrf-token': session?.csrfToken ?? '',
         ...options.headers,
       },
     }).then(async (res) => {

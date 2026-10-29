@@ -10,7 +10,13 @@ export class AuthService {
   ) {}
 
   validate(username: string, password: string): string {
-    if (username !== this.config.username || password !== this.config.password) {
+    // Without configured credentials nobody can sign in, not even with empty ones.
+    if (
+      !this.config.username ||
+      !this.config.password ||
+      username !== this.config.username ||
+      password !== this.config.password
+    ) {
       throw new UnauthorizedException('Identifiants invalides');
     }
     return username;

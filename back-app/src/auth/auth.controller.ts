@@ -1,46 +1,28 @@
-import { Body, Controller, HttpCode, Post, Req, Res } from '@nestjs/common';
-import type { Request, Response } from 'express';
-import { ConfigService } from '@nestjs/config';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import { Public, SignInService } from '@nestjs/authentication';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 
+@Public()
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly config: ConfigService,
+    private readonly signInService: SignInService,
   ) {}
 
   @Post('login')
   @HttpCode(200)
-  async login(
-    @Body() dto: LoginDto,
-    @Req() req: Request,
-  ): Promise<{ userId: string }> {
+  async login(@Body() dto: LoginDto): Promise<{ userId: string }> {
     const userId = this.authService.validate(dto.username, dto.password);
-
-    await new Promise<void>((resolve, reject) => {
-      req.session.regenerate((err) => (err ? reject(err) : resolve()));
-    });
-
-    req.session.userId = userId;
-    req.session.createdAt = new Date().toISOString();
-
+    await this.signInService.signIn(userId, { method: 'password' });
     return { userId };
   }
 
   @Post('logout')
-  async logout(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<{ isLogout: boolean }> {
-    res.clearCookie(this.config.getOrThrow<string>('COOKIE_NAME'));
-    res.clearCookie(this.config.getOrThrow<string>('SESSION_COOKIE_NAME'));
-
-    await new Promise<void>((resolve, reject) => {
-      req.session.destroy((err) => (err ? reject(err) : resolve()));
-    });
-
+  @HttpCode(200)
+  async logout(): Promise<{ isLogout: boolean }> {
+    await this.signInService.signOut();
     return { isLogout: true };
   }
 }

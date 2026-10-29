@@ -1,32 +1,30 @@
-import { DynamicModule, Module } from '@nestjs/common';
-import { ServeStaticModule as NestServeStaticModule } from '@nestjs/serve-static';
-import { ConfigType } from '@nestjs/config';
+import { Module } from '@nestjs/common';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import type { ServeStaticModuleOptions } from '@nestjs/serve-static';
+import type { ConfigType } from '@nestjs/config';
 import { join } from 'path';
 import { appConfig } from '@/config/app.config';
 
-@Module({})
-export class ReactSpaModule {
-  static forRoot(): DynamicModule {
-    const isDev = process.env.NODE_ENV !== 'production';
-    const isMaintenance = process.env.MAINTENANCE === 'true';
+const PUBLIC_DIR = join(__dirname, '..', '..', 'public');
 
-    if (isDev && !isMaintenance) {
-      return { module: ReactSpaModule };
-    }
+@Module({
+  imports: [
+    ServeStaticModule.forRootAsync({
+      useFactory: ({
+        isProdMode,
+        isMaintenance,
+      }: ConfigType<typeof appConfig>): ServeStaticModuleOptions[] => {
+        if (!isProdMode && !isMaintenance) return [];
 
-    return {
-      module: ReactSpaModule,
-      imports: [
-        NestServeStaticModule.forRootAsync({
-          useFactory: (config: ConfigType<typeof appConfig>) => [{
-            rootPath: config.isMaintenance
-              ? join(__dirname, '..', '..', 'public', 'maintenance')
-              : join(__dirname, '..', '..', 'public', 'build'),
-            exclude: ['/api/*path'],
-          }],
-          inject: [appConfig.KEY],
-        }),
-      ],
-    };
-  }
-}
+        return [
+          {
+            rootPath: join(PUBLIC_DIR, isMaintenance ? 'maintenance' : 'build'),
+            exclude: ['/api/{*path}'],
+          },
+        ];
+      },
+      inject: [appConfig.KEY],
+    }),
+  ],
+})
+export class ReactSpaModule {}

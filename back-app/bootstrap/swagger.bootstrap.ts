@@ -1,13 +1,15 @@
-import { NestExpressApplication } from '@nestjs/platform-express';
+import type { NestNodeApplication } from '@nestjs/platform-node';
 import { ConfigType } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { appConfig } from '@/config/app.config';
 
 export class SwaggerBootstrap {
-  constructor(private readonly app: NestExpressApplication) {}
+  constructor(private readonly app: NestNodeApplication) {}
 
   configure(): void {
-    const { isProdMode } = this.app.get<ConfigType<typeof appConfig>>(appConfig.KEY);
+    const { isProdMode } = this.app.get<ConfigType<typeof appConfig>>(
+      appConfig.KEY,
+    );
     if (isProdMode) return;
 
     const config = new DocumentBuilder()
@@ -17,10 +19,8 @@ export class SwaggerBootstrap {
       .addTag('nest-setup')
       .build();
 
-    SwaggerModule.setup(
-      'api-docs',
-      this.app,
-      () => SwaggerModule.createDocument(this.app, config),
+    SwaggerModule.setup('api-docs', this.app, () =>
+      SwaggerModule.createDocument(this.app, config),
     );
   }
 }

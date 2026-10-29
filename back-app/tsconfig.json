@@ -21,6 +21,9 @@
     "strictBindCallApply": true,
     "strictPropertyInitialization": false,
     "noFallthroughCasesInSwitch": true,
+    "strict": true,
+    "rootDir": ".",
+    "types": ["node", "jest"],
     "paths": {
       "@/*": [
         "./src/*"
